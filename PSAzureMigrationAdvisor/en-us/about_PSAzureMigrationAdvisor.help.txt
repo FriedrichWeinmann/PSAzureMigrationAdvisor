@@ -1,0 +1,11 @@
+﻿TOPIC
+	about_PSAzureMigrationAdvisor
+	
+SHORT DESCRIPTION
+	Explains how to use the PSAzureMigrationAdvisor powershell module
+	
+LONG DESCRIPTION
+	<Insert Content here>
+
+KEYWORDS
+	PSAzureMigrationAdvisor

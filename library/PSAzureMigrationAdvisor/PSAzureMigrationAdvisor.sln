@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D3E0C512-FABC-41E0-AEEA-2FB58E17FBB6}") = "PSAzureMigrationAdvisor", "PSAzureMigrationAdvisor\PSAzureMigrationAdvisor.csproj", "{B04FEBE3-9B41-40BD-BE86-83A6EA0ACFDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B04FEBE3-9B41-40BD-BE86-83A6EA0ACFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B04FEBE3-9B41-40BD-BE86-83A6EA0ACFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B04FEBE3-9B41-40BD-BE86-83A6EA0ACFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B04FEBE3-9B41-40BD-BE86-83A6EA0ACFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A151760-BA7B-4976-9C53-05362DA8F61F}
+	EndGlobalSection
+EndGlobal
