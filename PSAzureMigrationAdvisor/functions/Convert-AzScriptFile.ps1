@@ -51,7 +51,7 @@
 		You may want to create a backup before doing this.
 		Also consider the messages written!
 	#>
-	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High', DefaultParameterSetName = 'preset')]
 	param (
 		[Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
 		[Alias('FullName')]
