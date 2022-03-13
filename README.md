@@ -1,31 +1,51 @@
-﻿# Description
+﻿# PSAzureMigrationAdvisor
 
-Insert a useful description for the PSAzureMigrationAdvisor project here.
+Welcome to the migration toolkit designed to help you migrate your azure-related PowerShell script code.
+The sad fact is, it is getting harder and harder to keep track of changes, of what you need to do to keep your code running - especially when all this scripting is not really your main task and you cannot fully devote the time for it.
 
-Remember, it's the first thing a visitor will see.
+This is where this project tries to step up and help you.
+This is not a magic tool that will wave away all of your problems, but it should help you at least get started and where to look.
 
-# Project Setup Instructions
-## Working with the layout
+## Scope
 
-- Don't touch the psm1 file
-- Place functions you export in `functions/` (can have subfolders)
-- Place private/internal functions invisible to the user in `internal/functions` (can have subfolders)
-- Don't add code directly to the `postimport.ps1` or `preimport.ps1`.
-  Those files are designed to import other files only.
-- When adding files & folders, make sure they are covered by either `postimport.ps1` or `preimport.ps1`.
-  This adds them to both the import and the build sequence.
+Currently in scope for this tool:
 
-## Setting up CI/CD
+> Migrating from AzureAD to Microsoft.Graph
 
-> To create a PR validation pipeline, set up tasks like this:
+The old AzureAD module and its associated API are being retired, the new way to do things is in the Graph API.
+This toolkit will help you search your scripts for code that needs to be migrated and helps you get started getting there.
 
-- Install Prerequisites (PowerShell Task; VSTS-Prerequisites.ps1)
-- Validate (PowerShell Task; VSTS-Validate.ps1)
-- Publish Test Results (Publish Test Results; NUnit format; Run no matter what)
+> Migrating from Msonline to Migrosoft.Graph
 
-> To create a build/publish pipeline, set up tasks like this:
+The old Msonline module and its associated API are being retired, the new way to do things is in the Graph API.
+This toolkit will help you search your scripts for code that needs to be migrated and helps you get started getting there.
 
-- Install Prerequisites (PowerShell Task; VSTS-Prerequisites.ps1)
-- Validate (PowerShell Task; VSTS-Validate.ps1)
-- Build (PowerShell Task; VSTS-Build.ps1)
-- Publish Test Results (Publish Test Results; NUnit format; Run no matter what)
+## Installing
+
+To start using this module, you need to install it from the PowerShell Gallery:
+
+```powershell
+Install-Module PSAzureMigrationAdvisor -Scope CurrentUser
+```
+
+## Getting Started
+
+> AzureAD --> Microsoft.Graph | Msonline --> Microsoft.Graph
+
+```powershell
+# Scan for both AzureAD or Msonline commands
+Get-ChildItem C:\scripts -Recurse | Read-AzScriptFile
+
+# Scan for AzureAD commands only
+Get-ChildItem C:\scripts -Recurse | Read-AzScriptFile -Type AzureAD
+
+# Scan for Msonline commands only
+Get-ChildItem C:\scripts -Recurse | Read-AzScriptFile -Type Msonline
+```
+
+Note, the information displayed is formatted for readability, some information is hidden by default.
+To get the full information, it is probably easiest to export the data to CSV and check it out in excel:
+
+```powershell
+Get-ChildItem C:\scripts -Recurse | Read-AzScriptFile | Export-Csv .\scriptreport.csv
+```

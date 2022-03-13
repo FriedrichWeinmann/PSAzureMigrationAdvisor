@@ -12,7 +12,7 @@
 	Author = 'Friedrich Weinmann'
 	
 	# Company or vendor of this module
-	CompanyName = 'Microsoft'
+	CompanyName = ' '
 	
 	# Copyright statement for this module
 	Copyright = 'Copyright (c) 2022 Friedrich Weinmann'
@@ -21,7 +21,7 @@
 	Description = 'Tools to help migrate scripts using the official Azure/AzureAD modules'
 	
 	# Minimum version of the Windows PowerShell engine required by this module
-	PowerShellVersion = '5.0'
+	PowerShellVersion = '5.1'
 	
 	# Modules that must be imported into the global environment prior to importing
 	# this module
@@ -36,19 +36,22 @@
 	# TypesToProcess = @('xml\PSAzureMigrationAdvisor.Types.ps1xml')
 	
 	# Format files (.ps1xml) to be loaded when importing this module
-	# FormatsToProcess = @('xml\PSAzureMigrationAdvisor.Format.ps1xml')
+	FormatsToProcess = @('xml\PSAzureMigrationAdvisor.Format.ps1xml')
 	
 	# Functions to export from this module
-	FunctionsToExport = ''
+	FunctionsToExport = @(
+		'Convert-AzScriptFile'
+		'Read-AzScriptFile'
+	)
 	
 	# Cmdlets to export from this module
-	CmdletsToExport = ''
+	# CmdletsToExport = ''
 	
 	# Variables to export from this module
-	VariablesToExport = ''
+	# VariablesToExport = ''
 	
 	# Aliases to export from this module
-	AliasesToExport = ''
+	# AliasesToExport = ''
 	
 	# List of all modules packaged with this module
 	ModuleList = @()
@@ -63,19 +66,19 @@
 		PSData = @{
 			
 			# Tags applied to this module. These help with module discovery in online galleries.
-			# Tags = @()
+			Tags = @('refactor','migration','ast','scripting')
 			
 			# A URL to the license for this module.
-			# LicenseUri = ''
+			LicenseUri = 'https://github.com/FriedrichWeinmann/PSAzureMigrationAdvisor/blob/master/LICENSE'
 			
 			# A URL to the main website for this project.
-			# ProjectUri = ''
+			ProjectUri = 'https://github.com/FriedrichWeinmann/PSAzureMigrationAdvisor'
 			
 			# A URL to an icon representing this module.
 			# IconUri = ''
 			
 			# ReleaseNotes of this module
-			# ReleaseNotes = ''
+			ReleaseNotes = 'https://github.com/FriedrichWeinmann/PSAzureMigrationAdvisor/blob/master/PSAzureMigrationAdvisor/changelog.md'
 			
 		} # End of PSData hashtable
 		
