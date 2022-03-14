@@ -22,4 +22,4 @@ TestResults/*
 publish/*
 
 # ignore the built daata files
-PSAzureMigrationAdvisor/PSAzureMigrationAdvisor/data/*.psd1
+PSAzureMigrationAdvisor/data/*.psd1
