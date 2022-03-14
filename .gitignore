@@ -20,3 +20,6 @@ TestResults/*
 
 # ignore the publishing Directory
 publish/*
+
+# ignore the built daata files
+PSAzureMigrationAdvisor/data/*.psd1

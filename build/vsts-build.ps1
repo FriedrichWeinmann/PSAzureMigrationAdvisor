@@ -36,6 +36,7 @@ if (-not $WorkingDirectory) { $WorkingDirectory = Split-Path $PSScriptRoot }
 # Prepare publish folder
 Write-PSFMessage -Level Important -Message "Creating and populating publishing directory"
 $publishDir = New-Item -Path $WorkingDirectory -Name publish -ItemType Directory -Force
+& "$PSScriptRoot/vsts-builddatafiles.ps1"
 Copy-Item -Path "$($WorkingDirectory)\PSAzureMigrationAdvisor" -Destination $publishDir.FullName -Recurse -Force
 
 #region Gather text data to compile
