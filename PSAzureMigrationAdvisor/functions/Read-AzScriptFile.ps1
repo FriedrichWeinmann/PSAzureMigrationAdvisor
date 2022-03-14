@@ -101,7 +101,9 @@
 				Write-PSFMessage -String 'Read-AzScriptFile.Path.CommandsFound' -StringValues @($relevantTokens).Count, $filePath -Target $filePath
 
 				$results = $scriptFile.Transform($relevantTokens)
+				$messagesUsed = [System.Collections.ArrayList]::new()
 				foreach ($result in $results.Results) {
+					$messages = $results.Messages | Where-Object Token -EQ $result.Token
 					[PSCustomObject]@{
 						PSTypeName  = 'PSAzureMigrationAdvisor.ScanResult'
 						Path        = $result.Path
@@ -109,11 +111,17 @@
 						CommandLine = $result.Token.Ast.Extent.StartLineNumber
 						Before      = $result.Change.Before
 						After       = $result.Change.After
-						Message     = ''
-						MessageType = ''
+						Message     = $messages.Text -join "`n"
+						MessageType = $messages.Type -join "`n"
+					}
+					foreach ($message in $messages) {
+						$null = $messagesUsed.Add($message)
 					}
 				}
 				foreach ($message in $results.Messages) {
+					# If messages were found that are not associated to a resultant token
+					if ($message -in $messagesUsed) { continue }
+
 					[PSCustomObject]@{
 						PSTypeName  = 'PSAzureMigrationAdvisor.ScanResult'
 						Path        = $results.Path
