@@ -19,6 +19,14 @@
 	
 	.PARAMETER Path
 		Path to the script-file(s) to scan
+
+	.PARAMETER Name
+		Name of the script to scan
+		Used for scenarios where the scanned code is not in a file format (e.g. from Azure DevOps API)
+
+	.PARAMETER Content
+		Content/Code of the script to scan
+		Used for scenarios where the scanned code is not in a file format (e.g. from Azure DevOps API)
 	
 	.PARAMETER Type
 		What kind of module to migrate.
@@ -34,6 +42,10 @@
 		https://github.com/FriedrichWeinmann/Refactor
 
 		If your own customizations could be viable for a larger audience, please consider filing them as a pull request on this project.
+
+	.PARAMETER ExpandDevOps
+		Adds properties to the output for the input's organization, project, repository and branch.
+		Only intended for input from scanning Azure DevOps Services repositories using the AzureDevOps.Services.OpenApi module.
 	
 	.PARAMETER EnableException
 		Replaces user friendly yellow warnings with bloody red exceptions of doom!
@@ -44,27 +56,121 @@
 
 		Scan all files under c:\scripts recursively and get a list of changes to perform and warnings to consider.
 	#>
-	[CmdletBinding(DefaultParameterSetName = 'preset')]
+	[CmdletBinding(DefaultParameterSetName = 'Path')]
 	param (
-		[Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Path')]
 		[Alias('FullName')]
 		[string[]]
 		$Path,
 
-		[Parameter(ParameterSetName = 'preset')]
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Content')]
+		[string]
+		$Name,
+
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Content')]
+		[string]
+		$Content,
+
 		[ValidateSet('AzureAD', 'MSOnline')]
 		[string[]]
 		$Type = @('AzureAD', 'MSOnline'),
 
-		[Parameter(Mandatory = $true, ParameterSetName = 'custom')]
 		[string[]]
 		$TransformPath,
+
+		[Parameter(ParameterSetName = 'Content')]
+		[switch]
+		$ExpandDevOps,
 
 		[switch]
 		$EnableException
 	)
 
 	begin {
+		#region Functions
+		function Read-ScriptFile {
+			[CmdletBinding()]
+			param (
+				[Refactor.ScriptFile]
+				$ScriptFile,
+
+				[string[]]
+				$CommandNames,
+
+				[switch]
+				$ExpandDevOps
+			)
+
+			if ($ExpandDevOps) {
+				$splitPath = $ScriptFile.Path -split "/", 4
+				$branch = ($ScriptFile.Path -split '\[')[-1].Trim(']')
+				$devOpsHash = [ordered]@{
+					Organization = $splitPath[0]
+					Project      = $splitPath[1]
+					Repository   = $splitPath[2]
+					Branch       = $branch
+				}
+			}
+
+			$hashAlgorithm = [System.Security.Cryptography.HashAlgorithm]::Create("MD5")
+			$messageParam = @{
+				FunctionName = 'Read-AzScriptFile'
+				ModuleName   = 'PSAzureMigrationAdvisor'
+				Target       = $ScriptFile.Path
+			}
+			$relevantTokens = $scriptFile.GetTokens() | Where-Object Name -In $CommandNames | Where-Object Type -EQ Command
+
+			if (-not $relevantTokens) {
+				Write-PSFMessage @messageParam -String 'Read-AzScriptFile.Path.NoAzCommand' -StringValues $ScriptFile.Path
+				return
+			}
+			$fileBytes = [System.Text.Encoding]::UTF8.GetBytes($scriptFile.Content)
+			$fileHash = $hashAlgorithm.ComputeHash($fileBytes).ForEach{ $_.ToString('x2') } -join ""
+
+			Write-PSFMessage @messageParam -String 'Read-AzScriptFile.Path.CommandsFound' -StringValues @($relevantTokens).Count, $ScriptFile.Path
+
+			$results = $scriptFile.Transform($relevantTokens)
+			$messagesUsed = [System.Collections.ArrayList]::new()
+			foreach ($result in $results.Results) {
+				$messages = $results.Messages | Where-Object Token -EQ $result.Token
+				$resultHash = [ordered]@{
+					PSTypeName  = 'PSAzureMigrationAdvisor.ScanResult'
+					Path        = $result.Path
+					Command     = $result.Token -replace '^Command -> '
+					CommandLine = $result.Token.Ast.Extent.StartLineNumber
+					Before      = $result.Change.Before
+					After       = $result.Change.After
+					Message     = $messages.Text -join "`n"
+					MessageType = $messages.Type -join "`n"
+					FileHash    = $fileHash
+				}
+				if ($ExpandDevOps) { $resultHash += $devOpsHash }
+				[PSCustomObject]$resultHash
+				foreach ($message in $messages) {
+					$null = $messagesUsed.Add($message)
+				}
+			}
+			foreach ($message in $results.Messages) {
+				# If messages were found that are not associated to a resultant token
+				if ($message -in $messagesUsed) { continue }
+
+				$resultHash = [ordered]@{
+					PSTypeName  = 'PSAzureMigrationAdvisor.ScanResult'
+					Path        = $results.Path
+					Command     = $message.Data.Name
+					CommandLine = $message.Token.Ast.Extent.StartLineNumber
+					Before      = ''
+					After       = ''
+					Message     = $message.Text
+					MessageType = $message.Type
+					FileHash    = $fileHash
+				}
+				if ($ExpandDevOps) { $resultHash += $devOpsHash }
+				[PSCustomObject]$resultHash
+			}
+		}
+		#endregion Functions
+
 		Clear-ReTokenTransformationSet
 		if ($TransformPath) {
 			Import-ReTokenTransformationSet -Path $TransformPath
@@ -77,6 +183,7 @@
 		$commandNames = (Get-ReTokenTransformationSet).Name
 	}
 	process {
+		#region Process by Path
 		foreach ($pathName in $Path) {
 			try { $paths = Resolve-PSFPath -Path $pathName -Provider FileSystem }
 			catch {
@@ -85,57 +192,24 @@
 			
 			#region Process individual files
 			foreach ($filePath in $paths) {
-				if ($filePath -notmatch '\.ps1$|\.psm1') {
+				if ($filePath -notmatch '\.ps1$|\.psm1|.psf1') {
 					Write-PSFMessage -Level Warning -String 'Read-AzScriptFile.Path.NoScript' -StringValues $filePath -Target $filePath
 					continue
 				}
 
 				$scriptFile = Get-ReScriptFile -Path $filePath
-				$relevantTokens = $scriptFile.GetTokens() | Where-Object Name -In $commandNames | Where-Object Type -EQ Command
-
-				if (-not $relevantTokens) {
-					Write-PSFMessage -String 'Read-AzScriptFile.Path.NoAzCommand' -StringValues $filePath -Target $filePath
-					continue
-				}
-
-				Write-PSFMessage -String 'Read-AzScriptFile.Path.CommandsFound' -StringValues @($relevantTokens).Count, $filePath -Target $filePath
-
-				$results = $scriptFile.Transform($relevantTokens)
-				$messagesUsed = [System.Collections.ArrayList]::new()
-				foreach ($result in $results.Results) {
-					$messages = $results.Messages | Where-Object Token -EQ $result.Token
-					[PSCustomObject]@{
-						PSTypeName  = 'PSAzureMigrationAdvisor.ScanResult'
-						Path        = $result.Path
-						Command     = $result.Token -replace '^Command -> '
-						CommandLine = $result.Token.Ast.Extent.StartLineNumber
-						Before      = $result.Change.Before
-						After       = $result.Change.After
-						Message     = $messages.Text -join "`n"
-						MessageType = $messages.Type -join "`n"
-					}
-					foreach ($message in $messages) {
-						$null = $messagesUsed.Add($message)
-					}
-				}
-				foreach ($message in $results.Messages) {
-					# If messages were found that are not associated to a resultant token
-					if ($message -in $messagesUsed) { continue }
-
-					[PSCustomObject]@{
-						PSTypeName  = 'PSAzureMigrationAdvisor.ScanResult'
-						Path        = $results.Path
-						Command     = $message.Data.Name
-						CommandLine = $message.Token.Ast.Extent.StartLineNumber
-						Before      = ''
-						After       = ''
-						Message     = $message.Text
-						MessageType = $message.Type
-					}
-				}
+				Read-ScriptFile -ScriptFile $scriptFile -CommandNames $commandNames
 			}
 			#endregion Process individual files
 		}
+		#endregion Process by Path
+
+		#region Process by Name & Content
+		if ($Name -and $Content) {
+			$scriptFile = Get-ReScriptFile -Name $Name -Content $Content
+			Read-ScriptFile -ScriptFile $scriptFile -CommandNames $commandNames -ExpandDevOps:$ExpandDevOps
+		}
+		#endregion Process by Name & Content
 	}
 	end {
 		Clear-ReTokenTransformationSet

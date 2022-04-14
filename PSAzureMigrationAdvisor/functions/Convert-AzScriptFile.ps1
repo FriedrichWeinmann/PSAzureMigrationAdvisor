@@ -94,7 +94,7 @@
 			
 			#region Process individual files
 			foreach ($filePath in $paths) {
-				if ($filePath -notmatch '\.ps1$|\.psm1') {
+				if ($filePath -notmatch '\.ps1$|\.psm1|\.psf1') {
 					Write-PSFMessage -Level Warning -String 'Convert-AzScriptFile.Path.NoScript' -StringValues $filePath -Target $filePath
 					continue
 				}
