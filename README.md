@@ -49,3 +49,50 @@ To get the full information, it is probably easiest to export the data to CSV an
 ```powershell
 Get-ChildItem C:\scripts -Recurse | Read-AzScriptFile | Export-Csv .\scriptreport.csv
 ```
+
+## Scanning Repositories
+
+Being able to scan script files is useful already, but ... what about all that code people put into repositories?
+Well ... there is no perfect answer here, but some tools and options exist:
+
+### Azure DevOps Services
+
+> Requires the module [`AzureDevOps.Services.OpenApi`](https://github.com/FriedrichWeinmann/AzureDevOps.Services.OpenApi)
+
+```powershell
+Install-Module AzureDevOps.Services.OpenApi -Scope CurrentUser
+```
+
+With that we can now scan all the projects in the organization, searching through all repositories and all branches for all PowerShell script files and check, whether something needs updating:
+
+```powershell
+Get-AdsRepositoryFile -Organization $orgName -IncludeContent -Name *.ps1,*.psm1 | Read-AzScriptFile | Export-Csv .\scriptreport.csv
+```
+
+To improve the results' usefulness, there is another parameter to `Read-AzScriptFile` that enables separate properties for project, repository, branch and organization in the output:
+
+```powershell
+Get-AdsRepositoryFile -Organization $orgName -IncludeContent -Name *.ps1,*.psm1 | Read-AzScriptFile -ExpandDevOps | Export-Csv .\scriptreport.csv
+```
+
+### GitHub
+
+> Requires the module [`PowerShellForGitHub.Content`](https://github.com/FriedrichWeinmann/PowerShellForGitHub.Content)
+
+```powershell
+Install-Module PowerShellForGitHub.Content -Scope CurrentUser
+```
+
+With that we can now scan all the repositories in an organization or private account, searching through all branches for all PowerShell script files and check, whether something needs updating:
+
+```powershell
+Get-GithubRepositoryFile -Organization $orgName -Name *.ps1,*.psm1 | Read-AzScriptFile | Export-Csv .\scriptreport.csv
+```
+
+To improve the results' usefulness, there is another parameter to `Read-AzScriptFile` that enables separate properties for repository, branch and organization in the output:
+
+```powershell
+Get-GithubRepositoryFile -Organization $orgName -Name *.ps1,*.psm1 | Read-AzScriptFile -ExpandDevOps | Export-Csv .\scriptreport.csv
+```
+
+> Note: This parameter was designed with output from Azure DevOps in mind, leading to potentially lightly confusing result when applied to GitHub output: The repository information is in the project column and the repository column should be ignored.
