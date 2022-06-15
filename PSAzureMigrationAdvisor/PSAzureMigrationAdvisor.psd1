@@ -3,7 +3,7 @@
 	RootModule = 'PSAzureMigrationAdvisor.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.1.5'
+	ModuleVersion = '1.1.8'
 	
 	# ID used to uniquely identify this module
 	GUID = 'f3cb2750-2108-4462-a86b-e542d12370c8'
@@ -27,7 +27,7 @@
 	# this module
 	RequiredModules = @(
 		@{ ModuleName='PSFramework'; ModuleVersion='1.6.214' }
-		@{ ModuleName='Refactor'; ModuleVersion='1.1.12' }
+		@{ ModuleName='Refactor'; ModuleVersion='1.1.15' }
 	)
 	
 	# Assemblies that must be loaded prior to importing this module
@@ -42,6 +42,7 @@
 	# Functions to export from this module
 	FunctionsToExport = @(
 		'Convert-AzScriptFile'
+		'Export-AzScriptReport'
 		'Read-AzScriptFile'
 	)
 	

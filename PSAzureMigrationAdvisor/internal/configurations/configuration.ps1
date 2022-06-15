@@ -13,3 +13,5 @@ Set-PSFConfig -Module 'PSAzureMigrationAdvisor' -Name 'Example.Setting' -Value 1
 
 Set-PSFConfig -Module 'PSAzureMigrationAdvisor' -Name 'Import.DoDotSource' -Value $false -Initialize -Validation 'bool' -Description "Whether the module files should be dotsourced on import. By default, the files of this module are read as string value and invoked, which is faster but worse on debugging."
 Set-PSFConfig -Module 'PSAzureMigrationAdvisor' -Name 'Import.IndividualFiles' -Value $false -Initialize -Validation 'bool' -Description "Whether the module files should be imported individually. During the module build, all module code is compiled into few files, which are imported instead by default. Loading the compiled versions is faster, using the individual files is easier for debugging and testing out adjustments."
+
+Set-PSFConfig -Module 'PSAzureMigrationAdvisor' -Name 'Export.CsvDelimiter' -Value '' -Initialize -Validation 'string' -Description 'The delimiter to use with "Export-AzScriptReport" when generating CSV files. By default, the current culture will be used.'
