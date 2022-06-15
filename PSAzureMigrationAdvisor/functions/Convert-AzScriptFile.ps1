@@ -21,7 +21,7 @@
 	
 	.PARAMETER Type
 		What kind of module to migrate.
-		Supports scanning for migrating AzureAD or Msonline, defaults to scanning both in parallel.
+		Supports scanning for migrating AzureAD or Msonline, defaults to scanning both at the same time.
 
 	.PARAMETER TransformPath
 		By default, this command uses a predefined set of scanning rules to determine which changes to perform and which warnings to write.
@@ -33,6 +33,9 @@
 		https://github.com/FriedrichWeinmann/Refactor
 
 		If your own customizations could be viable for a larger audience, please consider filing them as a pull request on this project.
+
+	.PARAMETER OutPath
+		Folder to which to write the converted scriptfile.
 	
 	.PARAMETER EnableException
 		Replaces user friendly yellow warnings with bloody red exceptions of doom!
@@ -67,6 +70,11 @@
 		[string[]]
 		$TransformPath,
 
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'path')]
+		[PsfValidateScript('PSFramework.Validate.FSPath.Folder', ErrorString = 'PSFramework.Validate.FSPath.Folder')]
+		[string]
+		$OutPath,
+
 		[switch]
 		$EnableException
 	)
@@ -84,8 +92,15 @@
 		}
 		
 		$commandNames = (Get-ReTokenTransformationSet).Name
+
+		$lastResolvedPath = ""
 	}
 	process {
+		if ($OutPath -ne $lastResolvedPath) {
+			$resolvedOutPath = Resolve-PSFPath -Path $OutPath
+			$lastResolvedPath = $OutPath
+		}
+
 		foreach ($pathName in $Path) {
 			try { $paths = Resolve-PSFPath -Path $pathName -Provider FileSystem }
 			catch {
@@ -94,7 +109,7 @@
 			
 			#region Process individual files
 			foreach ($filePath in $paths) {
-				if ($filePath -notmatch '\.ps1$|\.psm1|\.psf1') {
+				if ($filePath -notmatch '\.ps1$|\.psm1$|\.psf1$') {
 					Write-PSFMessage -Level Warning -String 'Convert-AzScriptFile.Path.NoScript' -StringValues $filePath -Target $filePath
 					continue
 				}
@@ -109,10 +124,19 @@
 
 				Write-PSFMessage -String 'Convert-AzScriptFile.Path.CommandsFound' -StringValues @($relevantTokens).Count, $filePath -Target $filePath
 
-				$results = $scriptFile.Transform($relevantTokens)
-				Invoke-PSFProtectedCommand -ActionString 'Convert-AzScriptFile.Converting' -ActionStringValues $results.Count, $filePath -ScriptBlock {
-					$scriptFile.Save($false)
-				} -Target $filePath -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				try { $results = $scriptFile.Transform($relevantTokens) }
+				catch { Stop-PSFFunction -String 'Convert-AzScriptFile.Converting.Error' -StringValues $filePath -ErrorRecord $_ -EnableException $EnableException -Continue -Target $filePath }
+
+				if ($OutPath) {
+					Invoke-PSFProtectedCommand -ActionString 'Convert-AzScriptFile.ConvertingWriting' -ActionStringValues $results.Count, $filePath, $resolvedOutPath -ScriptBlock {
+						$scriptfile.WriteTo($resolvedOutPath, "")
+					} -Target $filePath -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
+				else {
+					Invoke-PSFProtectedCommand -ActionString 'Convert-AzScriptFile.Converting' -ActionStringValues $results.Count, $filePath -ScriptBlock {
+						$scriptFile.Save($false)
+					} -Target $filePath -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
 				$results
 			}
 			#endregion Process individual files

@@ -68,6 +68,7 @@
 		$Name,
 
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Content')]
+		[AllowEmptyString()]
 		[string]
 		$Content,
 

@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.1.8 (2022-06-15)
+
++ New: Command Export-AzScriptReport - Provides improved reporting of results
++ Upd: Convert-AzScriptFile - added `-OutPath` parameter to support writing converted files to a different path, rather than overwriting the originals
++ Fix: Read-AzScriptFile - now accepts empty file-content.
+
 ## 1.1.5 (2022-04-14)
 
 + Upd: Read-AzScriptFile - added support to provide name and text content, instead of path to file
