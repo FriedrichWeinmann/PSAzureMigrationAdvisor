@@ -20,5 +20,8 @@ if (-not $WorkingDirectory) {
 if (-not $WorkingDirectory) { $WorkingDirectory = Split-Path $PSScriptRoot }
 #endregion Handle Working Directory Defaults
 
+$modulePath = Join-Path $WorkingDirectory 'PSAzureMigrationAdvisor/PSAzureMigrationAdvisor.psd1'
+Import-Module $modulePath
+
 $outPath = Join-Path $WorkingDirectory 'PSAzureMigrationAdvisor/data/'
 Update-AzADMapping -Force -ConfigRoot $outPath
