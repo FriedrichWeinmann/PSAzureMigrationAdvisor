@@ -18,5 +18,5 @@
 	'Read-AzScriptFile.Path.NoScript'         = 'The specified file is not a recognized script file: {0}' # $filePath
 	'Read-AzScriptFile.Path.ResolveError'     = 'Unable to resolve the specified path: {0}' # $pathName
 
-	'Update-AzureADMapping.Internet.Error'    = 'Error accessing github to download the latest data definitions.' #
+	'Update-AzADMapping.Internet.Error'       = 'Error accessing github to download the latest data definitions.' #
 }
