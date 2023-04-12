@@ -59,6 +59,11 @@
 
 		try { $steppable.Begin($true) }
 		catch { Stop-PSFFunction -String 'Export-AzScriptReport.Export.Failed' -StringValues $Path -ErrorRecord $_ -EnableException $true -Cmdlet $PSCmdlet }
+
+		# Ensure mappings for graph commands exist
+		if (0 -eq $script:migrationCommandMapping.Count) {
+			Import-MappingFile
+		}
 	}
 	process {
 		foreach ($datum in $InputObject) {
@@ -83,18 +88,27 @@
 			}
 			#endregion Process Messages
 
+			$mapped = $script:migrationCommandMapping.$($datum.Command)
 			$result = [PSCustomObject][ordered]@{
-				Path        = $datum.Path
-				Command     = $datum.Command
-				CommandLine = $datum.CommandLine
-				Before      = $datum.Before -replace "``[`r`n]+" -replace '\s+', ' ' # Eliminate backticks and linebreaks
-				After       = $datum.After
-				MsgInfo     = $msgInfo -join "  "
-				MsgWarning  = $msgWarning -join "  "
-				MsgError    = $msgError -join "  "
-				FileHash    = $datum.Filehash
-				MessageType = $datum.MessageType # Keep in the full dataset, just in case somebody includes multiline messages
-				Messages    = $datum.Message
+				Path              = $datum.Path
+				Command           = $datum.Command
+				CommandLine       = $datum.CommandLine
+				Before            = $datum.Before -replace "``[`r`n]+" -replace '\s+', ' ' # Eliminate backticks and linebreaks
+				After             = $datum.After
+				MsgInfo           = $msgInfo -join "  "
+				MsgWarning        = $msgWarning -join "  "
+				MsgError          = $msgError -join "  "
+				FileHash          = $datum.Filehash
+				MessageType       = $datum.MessageType # Keep in the full dataset, just in case somebody includes multiline messages
+				Messages          = $datum.Message
+				ScopesDelegate    = $mapped.ScopesDelegate -join ','
+				ScopesApplication = $mapped.ScopesApplication -join ','
+				Examples          = $mapped.LinkExamples -join ', '
+				OnlineMapping     = 'https://github.com/microsoft/AzureAD-to-MSGraph/blob/main/docs/{0}/{1}.md' -f $mapped.Module, $mapped.Name
+				Organization      = $datum.Organization
+				Project           = $datum.Project
+				Repository        = $datum.Repository
+				Branch            = $datum.Branch
 			}
 			$steppable.Process($result)
 		}

@@ -17,4 +17,6 @@
 	'Read-AzScriptFile.Path.NoAzCommand'      = 'No applicable commands found in "{0}", skipping file' # $filePath
 	'Read-AzScriptFile.Path.NoScript'         = 'The specified file is not a recognized script file: {0}' # $filePath
 	'Read-AzScriptFile.Path.ResolveError'     = 'Unable to resolve the specified path: {0}' # $pathName
+
+	'Update-AzADMapping.Internet.Error'       = 'Error accessing github to download the latest data definitions.' #
 }

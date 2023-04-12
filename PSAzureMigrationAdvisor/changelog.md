@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.2.11 (2023-04-12)
+
++ Major: Reworked the way mapping data was provided, including the latest mapping data from https://github.com/microsoft/AzureAD-to-MSGraph
++ New: Command Update-AzADMapping - Updates Azure AD to Microsoft Graph API command mapping data.
++ Upd: Export-AzScriptReport - Added scopes, Examples and mapping urls
+
 ## 1.1.8 (2022-06-15)
 
 + New: Command Export-AzScriptReport - Provides improved reporting of results

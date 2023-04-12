@@ -87,8 +87,7 @@
 			Import-ReTokenTransformationSet -Path $TransformPath
 		}
 		else {
-			if ($Type -contains 'AzureAD') { Import-ReTokenTransformationSet -Path "$script:ModuleRoot\data\azureAD-to-graph.psd1" }
-			if ($Type -contains 'MSOnline') { Import-ReTokenTransformationSet -Path "$script:ModuleRoot\data\msol-to-graph.psd1" }
+			Import-MappingFile -Type $Type
 		}
 		
 		$commandNames = (Get-ReTokenTransformationSet).Name

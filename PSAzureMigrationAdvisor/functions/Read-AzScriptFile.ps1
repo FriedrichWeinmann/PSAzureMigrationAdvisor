@@ -30,7 +30,7 @@
 	
 	.PARAMETER Type
 		What kind of module to migrate.
-		Supports scanning for migrating AzureAD or Msonline, defaults to scanning both in parallel.
+		Supports scanning for migrating AzureADPreview, AzureAD or Msonline, defaults to scanning AzureADPreview & MSOnline in parallel.
 
 	.PARAMETER TransformPath
 		By default, this command uses a predefined set of scanning rules to determine which changes to perform and which warnings to write.
@@ -72,9 +72,9 @@
 		[string]
 		$Content,
 
-		[ValidateSet('AzureAD', 'MSOnline')]
+		[ValidateSet('AzureADPreview', 'AzureAD', 'MSOnline')]
 		[string[]]
-		$Type = @('AzureAD', 'MSOnline'),
+		$Type = @('AzureADPreview', 'MSOnline'),
 
 		[string[]]
 		$TransformPath,
@@ -177,8 +177,7 @@
 			Import-ReTokenTransformationSet -Path $TransformPath
 		}
 		else {
-			if ($Type -contains 'AzureAD') { Import-ReTokenTransformationSet -Path "$script:ModuleRoot\data\azureAD-to-graph.psd1" }
-			if ($Type -contains 'MSOnline') { Import-ReTokenTransformationSet -Path "$script:ModuleRoot\data\msol-to-graph.psd1" }
+			Import-MappingFile -Type $Type
 		}
 		
 		$commandNames = (Get-ReTokenTransformationSet).Name
