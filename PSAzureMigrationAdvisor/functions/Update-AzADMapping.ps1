@@ -24,6 +24,7 @@
 		https://github.com/microsoft/AzureAD-to-MSGraph
 
 #>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
 	[CmdletBinding()]
 	param (
 		[string]
