@@ -22,5 +22,8 @@ $moduleRoot = Split-Path (Split-Path $PSScriptRoot)
 # Load Tab Expansion Assignment
 "$moduleRoot\internal\tepp\assignment.ps1"
 
+"$moduleRoot\internal\scripts\variables.ps1"
+"$moduleRoot\internal\scripts\initialize.ps1"
+
 # Load License
 "$moduleRoot\internal\scripts\license.ps1"

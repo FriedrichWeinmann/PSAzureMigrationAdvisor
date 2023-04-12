@@ -23,3 +23,5 @@ publish/*
 
 # ignore the built daata files
 PSAzureMigrationAdvisor/data/*.psd1
+PSAzureMigrationAdvisor/data/*.json
+PSAzureMigrationAdvisor/data/*.clidat
