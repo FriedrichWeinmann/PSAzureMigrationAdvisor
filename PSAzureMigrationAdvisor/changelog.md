@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.2.14 (2023-04-13)
+
++ Upd: Configuration PSAzureMigrationAdvisor.Export.CsvDelimiter - new default value ","
+
 ## 1.2.13 (2023-04-13)
 
 + Upd: Export-AzScriptReport - now has the ability to write the converted files to disk.
