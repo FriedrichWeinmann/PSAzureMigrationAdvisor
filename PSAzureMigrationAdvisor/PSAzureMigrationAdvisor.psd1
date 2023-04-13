@@ -3,7 +3,7 @@
 	RootModule = 'PSAzureMigrationAdvisor.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.2.11'
+	ModuleVersion = '1.2.13'
 	
 	# ID used to uniquely identify this module
 	GUID = 'f3cb2750-2108-4462-a86b-e542d12370c8'

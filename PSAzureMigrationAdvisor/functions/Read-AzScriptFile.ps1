@@ -119,18 +119,18 @@
 				ModuleName   = 'PSAzureMigrationAdvisor'
 				Target       = $ScriptFile.Path
 			}
-			$relevantTokens = $scriptFile.GetTokens() | Where-Object Name -In $CommandNames | Where-Object Type -EQ Command
+			$relevantTokens = $ScriptFile.GetTokens() | Where-Object Name -In $CommandNames | Where-Object Type -EQ Command
 
 			if (-not $relevantTokens) {
 				Write-PSFMessage @messageParam -String 'Read-AzScriptFile.Path.NoAzCommand' -StringValues $ScriptFile.Path
 				return
 			}
-			$fileBytes = [System.Text.Encoding]::UTF8.GetBytes($scriptFile.Content)
+			$fileBytes = [System.Text.Encoding]::UTF8.GetBytes($ScriptFile.Content)
 			$fileHash = $hashAlgorithm.ComputeHash($fileBytes).ForEach{ $_.ToString('x2') } -join ""
 
 			Write-PSFMessage @messageParam -String 'Read-AzScriptFile.Path.CommandsFound' -StringValues @($relevantTokens).Count, $ScriptFile.Path
 
-			$results = $scriptFile.Transform($relevantTokens)
+			$results = $ScriptFile.Transform($relevantTokens)
 			$messagesUsed = [System.Collections.ArrayList]::new()
 			foreach ($result in $results.Results) {
 				$messages = $results.Messages | Where-Object Token -EQ $result.Token
@@ -144,6 +144,7 @@
 					Message     = $messages.Text -join "`n"
 					MessageType = $messages.Type -join "`n"
 					FileHash    = $fileHash
+					_ScriptFile  = $ScriptFile
 				}
 				if ($ExpandDevOps) { $resultHash += $devOpsHash }
 				[PSCustomObject]$resultHash
@@ -165,6 +166,7 @@
 					Message     = $message.Text
 					MessageType = $message.Type
 					FileHash    = $fileHash
+					_ScriptFile  = $ScriptFile
 				}
 				if ($ExpandDevOps) { $resultHash += $devOpsHash }
 				[PSCustomObject]$resultHash
