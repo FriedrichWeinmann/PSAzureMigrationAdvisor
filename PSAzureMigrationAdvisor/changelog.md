@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.2.13 (2023-04-13)
+
++ Upd: Export-AzScriptReport - now has the ability to write the converted files to disk.
++ Upd: Read-AzScriptFile - now returns the ScriptFile object from Refactor to give the user access to the underlying content on which the findings are based.
+
 ## 1.2.11 (2023-04-12)
 
 + Major: Reworked the way mapping data was provided, including the latest mapping data from https://github.com/microsoft/AzureAD-to-MSGraph
