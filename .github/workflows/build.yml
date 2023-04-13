@@ -17,7 +17,7 @@ jobs:
       run: .\build\vsts-validate.ps1
       shell: powershell
     - name: Build
-      run: .\build\vsts-build.ps1 -ApiKey $env:APIKEY -AutoVersion
+      run: .\build\vsts-build.ps1 -ApiKey $env:APIKEY
       shell: powershell
       env:
         APIKEY: ${{ secrets.ApiKey }}
